@@ -1,13 +1,7 @@
 <%
-    Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-    Boolean isClubOfficer = (Boolean) session.getAttribute("isClubOfficer");
-
-    if (isAdmin == null) isAdmin = false;
-    if (isClubOfficer == null) isClubOfficer = false;
-
-    String activeAdminPage = (String) request.getAttribute("activeAdminPage");
-    if (activeAdminPage == null) {
-        activeAdminPage = "";
+    String activeNav = (String) request.getAttribute("activeNav");
+    if (activeNav == null) {
+        activeNav = "";
     }
 %>
 <body class="landing-body">
@@ -16,37 +10,34 @@
     <aside class="dashboard-sidebar" id="dashboardSidebar">
         <div class="dashboard-sidebar-header">
             <span class="dashboard-sidebar-title">Menu</span>
-            <button class="dashboard-sidebar-close" id="sidebarCloseBtn" type="button" aria-label="Close menu">&times;</button>
+            <button class="dashboard-sidebar-close" id="sidebarCloseBtn" type="button" aria-label="Close menu">ח</button>
         </div>
 
         <nav class="dashboard-sidebar-nav">
-            <a href="<%= ctx %>/dashboard.jsp" class="dashboard-sidebar-link">Dashboard</a>
-            <a href="<%= ctx %>/profile.jsp" class="dashboard-sidebar-link">Profile</a>
+            <a href="<%= ctx %>/dashboard.jsp"
+               class="dashboard-sidebar-link<%= "dashboard".equals(activeNav) ? " active" : "" %>">Dashboard</a>
+            <a href="<%= ctx %>/profile.jsp"
+               class="dashboard-sidebar-link<%= "profile".equals(activeNav) ? " active" : "" %>">Profile</a>
 
             <% if (!isClubOfficer && !isAdmin) { %>
-            <a href="<%= ctx %>/clubOfficerRequest.jsp" class="dashboard-sidebar-link">Request Club Officer Role</a>
+            <a href="<%= ctx %>/clubOfficerRequest.jsp"
+               class="dashboard-sidebar-link<%= "clubOfficer".equals(activeNav) ? " active" : "" %>">Request Club Officer Role</a>
             <% } %>
 
             <% if (isClubOfficer) { %>
-            <a href="<%= ctx %>/createClub.jsp" class="dashboard-sidebar-link">Create Club</a>
-            <a href="<%= ctx %>/createEvent.jsp" class="dashboard-sidebar-link">Create Event</a>
+            <a href="<%= ctx %>/createClub.jsp"
+               class="dashboard-sidebar-link<%= "createClub".equals(activeNav) ? " active" : "" %>">Create Club</a>
+            <a href="<%= ctx %>/createEvent.jsp"
+               class="dashboard-sidebar-link<%= "createEvent".equals(activeNav) ? " active" : "" %>">Create Event</a>
             <% } %>
 
             <% if (isAdmin) { %>
             <a href="<%= ctx %>/AdminOfficerRequestsServlet"
-               class="dashboard-sidebar-link <%= "officerRequests".equals(activeAdminPage) ? "active" : "" %>">
-                Manage Officer Requests
-            </a>
-
+               class="dashboard-sidebar-link<%= "adminOfficer".equals(activeNav) ? " active" : "" %>">Manage Officer Requests</a>
             <a href="<%= ctx %>/admin/users"
-               class="dashboard-sidebar-link <%= "users".equals(activeAdminPage) ? "active" : "" %>">
-                Manage Users
-            </a>
-
+               class="dashboard-sidebar-link<%= "adminUsers".equals(activeNav) ? " active" : "" %>">Manage Users</a>
             <a href="<%= ctx %>/admin/events"
-               class="dashboard-sidebar-link <%= "events".equals(activeAdminPage) ? "active" : "" %>">
-                Moderate Events
-            </a>
+               class="dashboard-sidebar-link<%= "adminEvents".equals(activeNav) ? " active" : "" %>">Moderate Events</a>
             <% } %>
         </nav>
 
@@ -84,5 +75,4 @@
             </div>
         </nav>
 
-        <main class="dashboard-content dashboard-content-wide">
-            
+        <main class="dashboard-content">
