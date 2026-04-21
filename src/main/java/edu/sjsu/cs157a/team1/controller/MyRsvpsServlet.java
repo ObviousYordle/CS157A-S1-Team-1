@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collections;
 
-public class EventsServlet extends HttpServlet {
+public class MyRsvpsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,12 +27,12 @@ public class EventsServlet extends HttpServlet {
         req.setAttribute("error", req.getParameter("error"));
 
         try {
-            req.setAttribute("events", rsvpDAO.getAllEventsForUser(userId));
+            req.setAttribute("events", rsvpDAO.getMyUpcomingRsvps(userId));
         } catch (Exception e) {
             req.setAttribute("events", Collections.emptyList());
-            req.setAttribute("error", "Unable to load events right now.");
+            req.setAttribute("error", "Unable to load your RSVPs right now.");
         }
 
-        req.getRequestDispatcher("events.jsp").forward(req, resp);
+        req.getRequestDispatcher("myRsvps.jsp").forward(req, resp);
     }
 }
