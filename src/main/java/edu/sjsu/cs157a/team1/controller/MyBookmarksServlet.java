@@ -1,6 +1,5 @@
 package edu.sjsu.cs157a.team1.controller;
 
-import edu.sjsu.cs157a.team1.dao.RsvpDAO;
 import edu.sjsu.cs157a.team1.dao.BookmarkDAO;
 
 import javax.servlet.ServletException;
@@ -10,9 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Set;
 
-public class EventsServlet extends HttpServlet {
+public class MyBookmarksServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -23,31 +21,18 @@ public class EventsServlet extends HttpServlet {
         }
 
         Integer userId = (Integer) session.getAttribute("userId");
-        RsvpDAO rsvpDAO = new RsvpDAO();
         BookmarkDAO bookmarkDAO = new BookmarkDAO();
-        String feedParam = req.getParameter("feed");
-        String feedMode = "personalized".equalsIgnoreCase(feedParam) ? "personalized" : "all";
 
         req.setAttribute("success", req.getParameter("success"));
         req.setAttribute("error", req.getParameter("error"));
-        req.setAttribute("feedMode", feedMode);
-        
-        try {
-            if ("personalized".equals(feedMode)) {
-                req.setAttribute("events", rsvpDAO.getFollowedClubEventsForUser(userId));
-            } else {
-                req.setAttribute("events", rsvpDAO.getAllEventsForUser(userId));
-            }
-            Set<Integer> bookmarkedEventIds = bookmarkDAO.getBookmarkedEventIds(userId);
-            req.setAttribute("bookmarkedEventIds", bookmarkedEventIds);
-            
 
+        try {
+            req.setAttribute("events", bookmarkDAO.getBookmarkedUpcomingEvents(userId));
         } catch (Exception e) {
             req.setAttribute("events", Collections.emptyList());
-            req.setAttribute("bookmarkedEventIds", Collections.emptySet());
-            req.setAttribute("error", "Unable to load events right now.");
+            req.setAttribute("error", "Unable to load saved events right now.");
         }
 
-        req.getRequestDispatcher("events.jsp").forward(req, resp);
+        req.getRequestDispatcher("myBookmarks.jsp").forward(req, resp);
     }
 }
