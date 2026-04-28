@@ -15,10 +15,9 @@
         return;
     }
 
-    request.setAttribute("activeNav", "");
+    request.setAttribute("activeNav", "myBookmarks");
 
     String csrfToken = CsrfUtil.getToken(session);
-
     List<EventView> events = (List<EventView>) request.getAttribute("events");
     String success = (String) request.getAttribute("success");
     String error = (String) request.getAttribute("error");
@@ -28,7 +27,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My RSVPs - SpartanClubConnect</title>
+    <title>Saved Events - SpartanClubConnect</title>
     <link rel="stylesheet" href="<%= ctx %>/css/global.css">
     <link rel="stylesheet" href="<%= ctx %>/css/landing.css">
     <link rel="stylesheet" href="<%= ctx %>/css/dashboard.css">
@@ -36,19 +35,21 @@
 </head>
 <%@ include file="/WEB-INF/jspf/dashboardShellStart.jspf" %>
             <section class="dashboard-page-header">
-                <h1 class="dashboard-page-title">My Upcoming RSVPs</h1>
+                <h1 class="dashboard-page-title">Saved Events</h1>
                 <p class="dashboard-page-subtitle">
-                    Review the events you’re attending or waitlisted for.
+                    Review events you bookmarked for later.
                 </p>
             </section>
-			<div class="club-profile-actions club-profile-actions--shell event-details-top-nav">
+
+            <div class="club-profile-actions club-profile-actions--shell event-details-top-nav">
                 <div class="club-profile-actions-row">
                     <a href="<%= ctx %>/events" class="secondary-btn club-profile-follow-btn event-details-nav-link">All Events</a>
+                    <a href="<%= ctx %>/my-bookmarks" class="secondary-btn club-profile-follow-btn event-details-nav-link" aria-current="page">Saved Events</a>
                     <a href="<%= ctx %>/dashboard.jsp" class="secondary-btn club-profile-follow-btn event-details-nav-link">Home</a>
                 </div>
             </div>
-            <section class="dashboard-form-card clubs-shell-card">
 
+            <section class="dashboard-form-card clubs-shell-card">
                 <% if (success != null && !success.isEmpty()) { %>
                     <p style="color: #0f7b0f;"><strong><%= HtmlEscape.escape(success) %></strong></p>
                 <% } %>
@@ -58,11 +59,14 @@
                 <% } %>
 
                 <% if (events == null || events.isEmpty()) { %>
-                    <p class="empty-hint">You have no upcoming RSVPs.</p>
+                    <p class="empty-hint">
+                        You have no saved events yet.
+                        <a href="<%= ctx %>/events">Browse events</a> to bookmark events for later.
+                    </p>
                 <% } else { %>
                     <ul class="club-list">
                         <% for (EventView event : events) { %>
-       					<li class="club-list-item">
+                        <li class="club-list-item">
                             <div class="club-list-item-body">
                                 <h2><a href="<%= ctx %>/event-details?eventId=<%= event.getEventId() %>"><%= HtmlEscape.escape(event.getTitle()) %></a></h2>
                                 <p class="club-meta">
@@ -72,16 +76,19 @@
                                     &middot; <%= HtmlEscape.escape(event.getLocation()) %>
                                 </p>
                                 <p class="club-meta">
-                                    Status: <strong><%= HtmlEscape.escape(event.getUserRsvpStatus()) %></strong>
+                                    RSVP: <%= event.getUserRsvpStatus() == null ? "Not RSVPed" : HtmlEscape.escape(event.getUserRsvpStatus()) %>
+                                    &middot;
+                                    Attendance: <%= event.getGoingCount() %>/<%= event.getCapacity() == null ? "No Limit" : event.getCapacity() %>
+                                    <%= event.isFull() ? " (Full)" : "" %>
                                 </p>
                             </div>
                             <div class="event-details-cta event-details-cta--in-card">
-                                <form action="<%= ctx %>/rsvp" method="post">
+                                <form action="<%= ctx %>/bookmark" method="post">
                                     <input type="hidden" name="csrfToken" value="<%= HtmlEscape.escape(csrfToken) %>">
-                                    <input type="hidden" name="action" value="cancel">
+                                    <input type="hidden" name="action" value="remove">
                                     <input type="hidden" name="eventId" value="<%= event.getEventId() %>">
-                                    <input type="hidden" name="returnTo" value="my-rsvps">
-                                    <button type="submit" class="secondary-btn event-details-action-btn"><%= "Waitlisted".equals(event.getUserRsvpStatus()) ? "Leave Waitlist" : "Cancel RSVP" %></button>
+                                    <input type="hidden" name="returnTo" value="my-bookmarks">
+                                    <button type="submit" class="secondary-btn event-details-action-btn">Remove Bookmark</button>
                                 </form>
                             </div>
                         </li>
